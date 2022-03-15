@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Merapar Interview Project</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+      html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
+      #users { border-collapse: collapse; width: 100%; margin-bottom: 64px;}
+      #users td, #users th { border: 1px solid #ddd; padding: 8px;}
+      #users tr:nth-child(even){background-color: #f2f2f2;}
+      #users tr:hover {background-color: #ddd;}
+      #users th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #04AA6D;
+        color: white;
+      }
+      .w3-content {max-width: 1024px; margin: auto;}
+      #myFooter { position: fixed; bottom: 0; width: 100%; }
+    </style>
+  </head>
+  <body>
+    <script type="module" defer src="../src/index.js"></script>
+    <div class="w3-top">
+      <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
+        <span class="w3-bar-item w3-hide-small w3-theme-l1">Merapar Recruitment Test</span>
+        <span class="w3-bar-item w3-hide-large w3-hide-medium w3-theme-l1">MRP</span>
+        <a href="/" class="w3-bar-item w3-button w3-hover-white">Users</a>
+        <a href="/posts" class="w3-bar-item w3-button w3-hover-white">Posts</a>
+        <a href="/comments" class="w3-bar-item w3-button w3-hover-white">Comments</a>
+      </div>
+    </div>
+    <div class="w3-main">
+
+      <div class="w3-row w3-content">
+        <div class="w3-row" style="padding-top:64px;">
+          <div class="w3-container">
+            <h1 class="w3-text-teal">Users</h1>
+          </div>
+        </div>
+        <div class="w3-container">
+          <table id="users">
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Status</th>
+                <th style="text-align: center;">Posts</th>
+                <th style="text-align: center;">Comments</th>
+              </tr>
+            </thead>
+            <tbody id="users-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <footer id="myFooter">
+        <div class="w3-container w3-theme-l1">
+          <p>Merapar Recruitment Test: Jomo Lumina</p>
+        </div>
+      </footer>
+      
+      <script type="text/javascript">
+        fetch('/src/data')
+        .then(response => response.json())
+        .then(data => {
+          if(data){
+            setUsers(data);
+          }
+        });
+        
+        function setUsers(data){
+          const users = data.users;
+          let tableData = "";
+          users.data.forEach(user => {
+            const color = user.status == 'Active' ? 'green' : 'red';
+            tableData += `<tr><td>${user.id}</td>
+                          <td>${user.name}</td>
+                          <td>${user.email}</td>
+                          <td>${user.gender}</td>
+                          <td style="color: ${color};">${user.status}</td>
+                          <td style="text-align: center; color: blue;"><a href="/posts?id=${user.id}">View</a></td>
+                          <td style="text-align: center; color: blue;"><a href="/comments?user_id=${user.id}">View</a></td></tr>`
+          });
+          document.getElementById('users-body').innerHTML = tableData;
+        }
+       </script>
+    </div>
+  </body>
+</html>

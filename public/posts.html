@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Merapar Interview Project</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+      html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
+      #posts-container {margin-bottom: 64px;}
+      .w3-content {max-width: 1024px; margin: auto;}
+      #myFooter { position: fixed; bottom: 0; width: 100%; }
+    </style>
+  </head>
+  <body>
+    <script type="module" defer src="../src/index.js"></script>
+    <div class="w3-top">
+      <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
+        <span class="w3-bar-item w3-hide-small w3-theme-l1">Merapar Recruitment Test</span>
+        <span class="w3-bar-item w3-hide-large w3-hide-medium w3-theme-l1">MRP</span>
+        <a href="/" class="w3-bar-item w3-button w3-hover-white">Users</a>
+        <a href="/posts" class="w3-bar-item w3-button w3-hover-white">Posts</a>
+        <a href="/comments" class="w3-bar-item w3-button w3-hover-white">Comments</a>
+      </div>
+    </div>
+    <div class="w3-main">
+      <div class="w3-row w3-content">
+        <div class="w3-row" style="padding-top:64px;">
+          <div class="w3-container">
+            <h1 class="w3-text-teal" id="title">Posts</h1>
+            <h4 class="w3-text-teal" id="author"></h4>
+          </div>
+        </div>
+        <div class="w3-container" id="posts-container"></div>
+      </div>
+
+      <footer id="myFooter">
+        <div class="w3-container w3-theme-l1">
+          <p>Merapar Recruitment Test: Jomo Lumina</p>
+        </div>
+      </footer>
+      
+      <script type="text/javascript">
+        fetch('/src/data')
+        .then(response => response.json())
+        .then(data => {
+          if(data){
+            setPosts(data);
+          }
+        });
+
+        function setPosts(data){
+          const queryString = window.location.search;
+          const comments = data.comments;
+          const users = data.users;
+          let postsData = data.posts;
+          let postsHtml = "";
+          let id = 0;
+          let user_id = 0;
+          let hasParams = false;
+
+          if(queryString){
+            const urlParams = new URLSearchParams(queryString);
+            id = urlParams.get('id') ? urlParams.get('id') : id;
+            user_id = urlParams.get('user_id') ? urlParams.get('user_id') : user_id;
+            let _data;
+            if(id > 0){
+              _data = postsData.data.filter(pd => pd.id == id);
+              postsData.data = _data;
+            }else if (user_id > 0){
+              _data = postsData.data.filter(pd => pd.user_id == user_id);
+              postsData.data = _data;
+            }
+            hasParams = user_id > 0 && id > 0;
+          }
+
+          let isSet = false;
+          postsData.data.forEach(post => {
+            let authorHTML = '';
+            if(hasParams) {
+              if(!isSet){
+                document.getElementById('author').innerHTML = `By ${post.author.name}`;  
+                isSet = true;
+              }
+            }else{
+              authorHTML = `<h6 class="w3-text-teal">By ${post.author.name}</h6>`
+            }
+
+            let commentsCountDiv = `<span style="color:blue;">${post.comments.length} comments</span>`;
+            let commentsDiv = "";
+            if(post.comments.length > 0){
+              commentsCountDiv = `<a href="javascript:void(0);" 
+                onclick="toggleComments(${post.id}, ${post.comments.length})" 
+                style="color:blue;" id='comment-link-${post.id}'>
+                  ${post.comments.length} comments
+                </a>`;
+
+              commentsDiv = `<div id="comment-block-${post.id}" style="display: none;">`;
+              post.comments.forEach(comm => {
+                const username = comm.author.name;
+                commentsDiv += `
+                  <div style="padding-left: 16px; font-size: 13px;">
+                    <span class="w3-text-teal" style="font-weight: bold">${username}</span>
+                    - <span>${comm.body}</span> 
+                  </div>`;
+              });
+              commentsDiv += "</div>"
+            }
+              
+            postsHtml += ` 
+              <div class="w3-row w3-padding-24">
+                <div class="w3-container">
+                  <h3 class="w3-text-teal">${post.title}</h3>
+                  ${authorHTML}
+                  <p>${post.body}</p>
+                  ${commentsCountDiv}
+                  ${commentsDiv}
+                </div>
+              </div>`;  
+          });
+          document.getElementById('posts-container').innerHTML = postsHtml;
+        }
+
+        function toggleComments(id, count){
+          let link = document.getElementById(`comment-link-${id}`);
+          let block = document.getElementById(`comment-block-${id}`);
+          if (block.style.display == "none") {
+            block.style.display = "block";
+            link.innerHTML = 'Hide comments';
+          } else {
+            block.style.display = "none";
+            link.innerHTML = `${count} comments`;
+          }
+        }
+       </script>
+    </div>
+  </body>
+</html>
