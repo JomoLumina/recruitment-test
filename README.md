@@ -1,5 +1,8 @@
-## Introduction
-The aim of this task is to test your engineering and problem solving ability.
+### Update
+
+To start the application use
+##### `npm start`
+
 
 We have provided for you a mocked out version of an endpoints for a posts, comments and users.
 
